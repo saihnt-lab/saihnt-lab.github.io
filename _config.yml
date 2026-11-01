@@ -1,0 +1,8 @@
+title: "PureTrace: Taint-Aware RAG for Zero-Noise SAST"
+description: "Slicing 91% of Static Analysis Noise via Graph-Based Taint Tracking and Constrained LLM Reasoning"
+theme: jekyll-theme-minimal
+
+# Enable LaTeX support via Kramdown
+markdown: kramdown
+kramdown:
+  math_engine: mathjax
