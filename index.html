@@ -1,0 +1,1946 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Semantrace: Killing the 91% Noise | Black Hat India Briefing</title>
+  <meta name="description" content="A Taint-Aware RAG Pipeline That Turns Static Analysis Into an Intelligent Vulnerability Hunter for Cloud and Embedded Systems" />
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/semantrace-icon.png" />
+  <link rel="apple-touch-icon" href="assets/semantrace-icon.png" />
+
+  <!-- OpenGraph / Social Media -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Semantrace: Killing the 91% Noise | Black Hat India Briefing" />
+  <meta property="og:description" content="A Taint-Aware RAG Pipeline That Turns Static Analysis Into an Intelligent Vulnerability Hunter for Cloud and Embedded Systems" />
+  <meta property="og:image" content="assets/semantrace-logo.png" />
+  <meta property="og:url" content="https://semantrace.github.io" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Semantrace: Killing the 91% Noise | Black Hat India Briefing" />
+  <meta name="twitter:description" content="A Taint-Aware RAG Pipeline That Turns Static Analysis Into an Intelligent Vulnerability Hunter for Cloud and Embedded Systems" />
+  <meta name="twitter:image" content="assets/semantrace-logo.png" />
+
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet" />
+
+  <!-- MathJax Configuration with Kramdown compatibility -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true,
+        processEnvironments: true
+      },
+      options: {
+        skipHtmlTags: ['style', 'textarea']
+      },
+      startup: {
+        ready: () => {
+          document.querySelectorAll('script[type^="math/tex"]').forEach((node) => {
+            const isDisplay = node.type.includes('mode=display');
+            const math = node.textContent;
+            const wrapper = document.createElement(isDisplay ? 'div' : 'span');
+            wrapper.className = isDisplay ? 'math-display' : 'math-inline';
+            wrapper.textContent = isDisplay ? `\\[${math}\\]` : `\\(${math}\\)`;
+            node.parentNode.replaceChild(wrapper, node);
+          });
+          MathJax.startup.defaultReady();
+        }
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    /* ==========================================================================
+       CSS Variables & Design Tokens (Modern Obsidian & Warm Paper Themes)
+       ========================================================================== */
+    :root {
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      --container-max: 1200px;
+      --content-max: 820px;
+      --hero-max: 980px;
+    }
+
+    /* Dark Mode (Default) */
+    [data-theme="dark"] {
+      --bg-primary: #0a0d14;
+      --bg-secondary: #0f1422;
+      --bg-surface: rgba(18, 24, 38, 0.72);
+      --bg-surface-solid: #121826;
+      --bg-card-hover: rgba(26, 36, 56, 0.85);
+      --bg-glass: rgba(10, 13, 20, 0.85);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-medium: rgba(255, 255, 255, 0.14);
+      --border-focus: rgba(56, 189, 248, 0.4);
+      
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --text-dim: #475569;
+      
+      --accent-cyan: #38bdf8;
+      --accent-cyan-bg: rgba(56, 189, 248, 0.1);
+      --accent-indigo: #818cf8;
+      --accent-indigo-bg: rgba(129, 140, 248, 0.12);
+      --accent-emerald: #34d399;
+      --accent-emerald-bg: rgba(52, 211, 153, 0.12);
+      --accent-amber: #fbbf24;
+      --accent-amber-bg: rgba(251, 191, 36, 0.12);
+      --accent-rose: #fb7185;
+      
+      --code-bg: #0d121f;
+      --code-border: rgba(255, 255, 255, 0.09);
+      --pre-bg: #090d16;
+      
+      --table-header-bg: rgba(255, 255, 255, 0.05);
+      --table-stripe: rgba(255, 255, 255, 0.02);
+      --table-border: rgba(255, 255, 255, 0.08);
+      
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
+      --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.6);
+      --shadow-glow: 0 0 35px rgba(56, 189, 248, 0.15);
+      --scrollbar-thumb: #1e293b;
+      --scrollbar-track: #0a0d14;
+    }
+
+    /* Light Mode */
+    [data-theme="light"] {
+      --bg-primary: #f8fafc;
+      --bg-secondary: #f1f5f9;
+      --bg-surface: rgba(255, 255, 255, 0.9);
+      --bg-surface-solid: #ffffff;
+      --bg-card-hover: #ffffff;
+      --bg-glass: rgba(248, 250, 252, 0.88);
+      --border-subtle: rgba(0, 0, 0, 0.08);
+      --border-medium: rgba(0, 0, 0, 0.14);
+      --border-focus: rgba(2, 132, 199, 0.4);
+      
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --text-dim: #94a3b8;
+      
+      --accent-cyan: #0284c7;
+      --accent-cyan-bg: rgba(2, 132, 199, 0.08);
+      --accent-indigo: #6366f1;
+      --accent-indigo-bg: rgba(99, 102, 241, 0.08);
+      --accent-emerald: #059669;
+      --accent-emerald-bg: rgba(5, 150, 105, 0.08);
+      --accent-amber: #d97706;
+      --accent-amber-bg: rgba(217, 119, 6, 0.08);
+      --accent-rose: #e11d48;
+      
+      --code-bg: #f1f5f9;
+      --code-border: rgba(0, 0, 0, 0.08);
+      --pre-bg: #f8fafc;
+      
+      --table-header-bg: rgba(0, 0, 0, 0.03);
+      --table-stripe: rgba(0, 0, 0, 0.015);
+      --table-border: rgba(0, 0, 0, 0.08);
+      
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.12);
+      --shadow-glow: 0 0 35px rgba(2, 132, 199, 0.1);
+      --scrollbar-thumb: #cbd5e1;
+      --scrollbar-track: #f8fafc;
+    }
+
+    /* ==========================================================================
+       Global Reset & Baseline
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.75;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow-x: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .ambient-glow {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .ambient-glow::before {
+      content: '';
+      position: absolute;
+      top: -20%;
+      left: 20%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.08) 0%, transparent 70%);
+      border-radius: 50%;
+      filter: blur(60px);
+    }
+
+    .ambient-glow::after {
+      content: '';
+      position: absolute;
+      top: -10%;
+      right: 20%;
+      width: 550px;
+      height: 550px;
+      background: radial-gradient(circle, rgba(129, 140, 248, 0.08) 0%, transparent 70%);
+      border-radius: 50%;
+      filter: blur(70px);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--scrollbar-track);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--scrollbar-thumb);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-muted);
+    }
+
+    /* Reading Progress Bar */
+    #progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-indigo), var(--accent-emerald));
+      z-index: 1000;
+      transition: width 0.1s ease-out;
+    }
+
+    /* ==========================================================================
+       Navbar & Header
+       ========================================================================== */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 900;
+      background: var(--bg-glass);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-subtle);
+      transition: var(--transition);
+    }
+
+    .nav-container {
+      max-width: var(--container-max);
+      margin: 0 auto;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand-link {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+
+    .brand-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      object-fit: contain;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .brand-badge {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.2rem 0.55rem;
+      border-radius: 9999px;
+      background: var(--accent-indigo-bg);
+      color: var(--accent-indigo);
+      border: 1px solid rgba(129, 140, 248, 0.25);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.1rem;
+      list-style: none;
+    }
+
+    @media (max-width: 1080px) {
+      .nav-links {
+        display: none;
+      }
+    }
+
+    .nav-link {
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: var(--transition);
+      padding: 0.35rem 0.55rem;
+      border-radius: var(--radius-sm);
+      white-space: nowrap;
+    }
+
+    .nav-link:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      flex-shrink: 0;
+    }
+
+    .btn-icon {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn-icon:hover {
+      color: var(--text-primary);
+      border-color: var(--border-medium);
+      transform: translateY(-1px);
+    }
+
+    .btn-github {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.45rem 0.85rem;
+      border-radius: var(--radius-md);
+      font-size: 0.82rem;
+      font-weight: 600;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      text-decoration: none;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .btn-github:hover {
+      border-color: var(--border-medium);
+      background: var(--bg-card-hover);
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 480px) {
+      .brand-badge {
+        display: none;
+      }
+      .btn-github span {
+        display: none;
+      }
+      .btn-github {
+        padding: 0.45rem;
+      }
+      .hero-title {
+        font-size: 1.65rem;
+      }
+      .hero-actions .btn-action {
+        width: 100%;
+        justify-content: center;
+      }
+      .hero-meta-badges {
+        gap: 0.4rem;
+      }
+      .meta-badge {
+        font-size: 0.74rem;
+        padding: 0.25rem 0.6rem;
+      }
+    }
+
+    /* ==========================================================================
+       Unified Layout Grid Architecture: Symmetrical Hero + Article/TOC
+       ========================================================================== */
+    .layout-wrapper {
+      max-width: var(--container-max);
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 260px;
+      grid-template-areas:
+        "hero hero"
+        "article toc";
+      column-gap: 3.5rem;
+      row-gap: 1rem;
+      position: relative;
+      z-index: 1;
+      width: 100%;
+    }
+
+    @media (max-width: 1040px) {
+      .layout-wrapper {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "hero"
+          "article";
+        column-gap: 0;
+        row-gap: 1.5rem;
+        padding: 1.5rem 1rem 3rem;
+      }
+      .toc-sidebar {
+        display: none !important;
+      }
+    }
+
+    .hero-wrapper {
+      grid-area: hero;
+      max-width: var(--hero-max);
+      margin: 0 auto 1.5rem;
+      width: 100%;
+      text-align: center;
+    }
+
+    .main-article {
+      grid-area: article;
+      max-width: var(--content-max);
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* ==========================================================================
+       Hero & Paper Header
+       ========================================================================== */
+    .hero-banner {
+      text-align: center;
+      padding: 1.5rem 0 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-logo-wrapper {
+      margin: 0 auto 1.5rem;
+      display: inline-flex;
+      position: relative;
+      border-radius: var(--radius-xl);
+      padding: 0.75rem;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.08) 0%, transparent 75%);
+    }
+
+    .hero-logo-img {
+      max-width: 420px;
+      width: 100%;
+      height: auto;
+      display: block;
+      filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.35));
+      border-radius: var(--radius-md);
+      transition: transform 0.3s ease;
+    }
+
+    .hero-logo-img:hover {
+      transform: scale(1.02);
+    }
+
+    .hero-meta-badges {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.6rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .meta-badge {
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      padding: 0.3rem 0.75rem;
+      border-radius: 9999px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .meta-badge.highlight {
+      background: var(--accent-cyan-bg);
+      color: var(--accent-cyan);
+      border-color: rgba(56, 189, 248, 0.3);
+    }
+
+    .hero-title {
+      font-size: 2.35rem;
+      font-weight: 800;
+      line-height: 1.22;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.85rem;
+      color: var(--text-primary);
+    }
+
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 1.85rem;
+      }
+    }
+
+    .hero-title .gradient-text {
+      background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+    }
+
+    .hero-subtitle {
+      font-size: 1.22rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      max-width: 780px;
+      margin: 0 auto 1.25rem;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 768px) {
+      .hero-subtitle {
+        font-size: 1.05rem;
+      }
+    }
+
+    .hero-byline {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .hero-byline strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .hero-byline a {
+      color: var(--accent-cyan);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .hero-byline a:hover {
+      text-decoration: underline;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.2rem;
+      border-radius: var(--radius-md);
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: var(--transition);
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #0284c7 0%, #4f46e5 100%);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #0369a1 0%, #4338ca 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(2, 132, 199, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--border-medium);
+      background: var(--bg-card-hover);
+      transform: translateY(-1px);
+    }
+
+    /* Black Hat Briefing Banner Card */
+    .briefing-card {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 27, 75, 0.5) 100%);
+      border: 1px solid rgba(129, 140, 248, 0.35);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem 1.75rem;
+      margin: 1.75rem auto;
+      max-width: var(--hero-max);
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 8px 32px rgba(99, 102, 241, 0.15);
+    }
+
+    [data-theme="light"] .briefing-card {
+      background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+      border-color: rgba(99, 102, 241, 0.25);
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.08);
+    }
+
+    .briefing-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(to bottom, #818cf8, #38bdf8);
+    }
+
+    .briefing-header {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .briefing-pill {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      background: rgba(129, 140, 248, 0.2);
+      color: var(--accent-indigo);
+      border: 1px solid rgba(129, 140, 248, 0.4);
+    }
+
+    .briefing-title {
+      font-size: 1.12rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .briefing-card p {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      margin-bottom: 0.85rem;
+    }
+
+    .briefing-card p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Stat Highlights Grid */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin: 1.75rem 0 2rem;
+      text-align: center;
+    }
+
+    @media (max-width: 860px) {
+      .stat-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .stat-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .stat-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition);
+      backdrop-filter: blur(12px);
+    }
+
+    .stat-card:hover {
+      border-color: var(--border-medium);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .stat-value {
+      font-size: 2.1rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 0.35rem;
+    }
+
+    .stat-cyan { color: var(--accent-cyan); }
+    .stat-indigo { color: var(--accent-indigo); }
+    .stat-emerald { color: var(--accent-emerald); }
+    .stat-amber { color: var(--accent-amber); }
+
+    .stat-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-secondary);
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    /* Section Divider */
+    .section-divider {
+      border: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-subtle), transparent);
+      margin: 1.5rem 0 2.5rem;
+    }
+
+    /* ==========================================================================
+       Article Typography & Elements
+       ========================================================================== */
+    .content-body h1,
+    .content-body h2,
+    .content-body h3,
+    .content-body h4 {
+      color: var(--text-primary);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      position: relative;
+      scroll-margin-top: 5rem;
+    }
+
+    .content-body h1 {
+      font-size: 2rem;
+      margin: 2.5rem 0 1rem;
+      line-height: 1.3;
+    }
+
+    .content-body h2 {
+      font-size: 1.55rem;
+      margin: 3rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .content-body h2::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 1.25rem;
+      background: linear-gradient(to bottom, var(--accent-cyan), var(--accent-indigo));
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .content-body h3 {
+      font-size: 1.22rem;
+      margin: 2rem 0 0.75rem;
+      color: var(--text-primary);
+    }
+
+    .content-body h4 {
+      font-size: 1.05rem;
+      margin: 1.5rem 0 0.5rem;
+    }
+
+    .content-body p {
+      margin-bottom: 1.25rem;
+      color: var(--text-secondary);
+      font-size: 1.025rem;
+      line-height: 1.78;
+    }
+
+    .content-body strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .content-body em {
+      color: var(--text-primary);
+      font-style: italic;
+    }
+
+    .content-body a {
+      color: var(--accent-cyan);
+      text-decoration: none;
+      border-bottom: 1px dotted rgba(56, 189, 248, 0.4);
+      transition: var(--transition);
+    }
+
+    .content-body a:hover {
+      color: var(--accent-indigo);
+      border-bottom-style: solid;
+      border-bottom-color: var(--accent-indigo);
+    }
+
+    .content-body ul,
+    .content-body ol {
+      margin: 1rem 0 1.5rem 1.5rem;
+      color: var(--text-secondary);
+    }
+
+    .content-body li {
+      margin-bottom: 0.6rem;
+      padding-left: 0.35rem;
+      line-height: 1.7;
+    }
+
+    .content-body li::marker {
+      color: var(--accent-cyan);
+    }
+
+    /* Abstract Block */
+    .abstract-box {
+      background: var(--bg-surface);
+      border-left: 4px solid var(--accent-cyan);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: 1.5rem 1.75rem;
+      margin: 1.5rem 0 2.5rem;
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .abstract-box p {
+      font-size: 1.05rem;
+      line-height: 1.8;
+      color: var(--text-secondary);
+      margin-bottom: 0.75rem;
+    }
+
+    .abstract-box p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Responsive Tables */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      margin: 2rem 0;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+      box-shadow: var(--shadow-sm);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.92rem;
+    }
+
+    th {
+      background: var(--table-header-bg);
+      color: var(--text-primary);
+      font-weight: 700;
+      padding: 0.9rem 1.1rem;
+      border-bottom: 1px solid var(--table-border);
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 0.85rem 1.1rem;
+      border-bottom: 1px solid var(--table-border);
+      color: var(--text-secondary);
+    }
+
+    tr:nth-child(even) td {
+      background: var(--table-stripe);
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .table-badge {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      white-space: nowrap;
+    }
+
+    .table-badge-success {
+      background: var(--accent-emerald-bg);
+      color: var(--accent-emerald);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+    }
+
+    .table-badge-highlight {
+      background: var(--accent-cyan-bg);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    /* Code & Pre Blocks */
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.88em;
+      padding: 0.2em 0.4em;
+      border-radius: var(--radius-sm);
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      color: var(--accent-cyan);
+    }
+
+    pre {
+      position: relative;
+      margin: 1.75rem 0 2rem;
+      border-radius: var(--radius-md);
+      background: var(--pre-bg);
+      border: 1px solid var(--code-border);
+      box-shadow: var(--shadow-sm);
+      overflow-x: auto;
+      padding: 2.75rem 1.5rem 1.25rem;
+    }
+
+    pre code {
+      background: transparent;
+      border: none;
+      padding: 0;
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: #cbd5e1;
+      display: block;
+      white-space: pre;
+      font-feature-settings: "liga" 0, "calt" 0;
+      tab-size: 2;
+    }
+
+    [data-theme="light"] pre code {
+      color: #334155;
+    }
+
+    /* Standard Pre Copy Button */
+    pre > .copy-btn {
+      position: absolute;
+      top: 0.65rem;
+      right: 0.75rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      border-radius: var(--radius-sm);
+      font-size: 0.74rem;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      padding: 0.25rem 0.6rem;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      z-index: 5;
+    }
+
+    /* Diagram Window Box */
+    .diagram-container {
+      margin: 2rem 0 2.5rem;
+      border-radius: var(--radius-lg);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+
+    .diagram-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.65rem 1rem;
+      background: rgba(0, 0, 0, 0.3);
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 0.78rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+    }
+
+    .diagram-header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .diagram-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .diagram-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .dot-red { background: #ef4444; }
+    .dot-yellow { background: #f59e0b; }
+    .dot-green { background: #10b981; }
+
+    .diagram-header-right {
+      display: flex;
+      align-items: center;
+    }
+
+    .diagram-header-right .copy-btn {
+      position: static;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      border-radius: var(--radius-sm);
+      font-size: 0.74rem;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      padding: 0.25rem 0.6rem;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .diagram-header-right .copy-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--border-medium);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .diagram-body {
+      padding: 1.25rem 1.5rem !important;
+      margin: 0 !important;
+      border: none !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      font-family: var(--font-mono) !important;
+      font-size: 0.82rem !important;
+      line-height: 1.4 !important;
+      color: var(--text-primary) !important;
+      overflow-x: auto !important;
+      white-space: pre !important;
+      font-feature-settings: "liga" 0, "calt" 0 !important;
+    }
+
+    .copy-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--border-medium);
+      background: var(--bg-card-hover);
+    }
+
+    .copy-btn.copied {
+      background: var(--accent-emerald-bg) !important;
+      color: var(--accent-emerald) !important;
+      border-color: rgba(52, 211, 153, 0.4) !important;
+    }
+
+    /* ==========================================================================
+       Table of Contents (Sticky Sidebar)
+       ========================================================================== */
+    .toc-sidebar {
+      grid-area: toc;
+      position: sticky;
+      top: 5rem;
+      height: fit-content;
+      max-height: calc(100vh - 6.5rem);
+      overflow-y: auto;
+      padding-left: 1.25rem;
+      border-left: 1px solid var(--border-subtle);
+    }
+
+    .toc-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .toc-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .toc-item {
+      margin-bottom: 0.35rem;
+    }
+
+    .toc-link {
+      display: block;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      padding: 0.35rem 0.6rem;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+      white-space: normal;
+      word-break: break-word;
+      border-left: 2px solid transparent;
+    }
+
+    .toc-link:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .toc-link.active {
+      color: var(--accent-cyan);
+      font-weight: 600;
+      background: var(--accent-cyan-bg);
+      border-left-color: var(--accent-cyan);
+    }
+
+    .toc-sublist {
+      list-style: none;
+      margin: 0.2rem 0 0.35rem 0.75rem;
+      padding: 0;
+      border-left: 1px solid var(--border-subtle);
+    }
+
+    .toc-sublist .toc-link {
+      font-size: 0.76rem;
+      padding: 0.25rem 0.5rem;
+    }
+
+    /* Back to Top Floating Button */
+    #back-to-top {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--bg-surface-solid);
+      border: 1px solid var(--border-medium);
+      color: var(--text-primary);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: var(--shadow-lg);
+      transition: var(--transition);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(10px);
+      z-index: 800;
+    }
+
+    #back-to-top.visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    #back-to-top:hover {
+      background: var(--accent-cyan-bg);
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+      transform: translateY(-3px);
+    }
+
+    /* Footer */
+    .site-footer {
+      border-top: 1px solid var(--border-subtle);
+      background: var(--bg-glass);
+      backdrop-filter: blur(12px);
+      padding: 3rem 1.5rem;
+      margin-top: auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-container {
+      max-width: var(--container-max);
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .footer-text {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: var(--transition);
+    }
+
+    .footer-links a:hover {
+      color: var(--accent-cyan);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Reading Progress Bar -->
+  <div id="progress-bar"></div>
+
+  <!-- Ambient Light Field -->
+  <div class="ambient-glow"></div>
+
+  <!-- Top Sticky Header -->
+  <header class="site-header">
+    <div class="nav-container">
+      <a href="" class="brand-link">
+        <img src="assets/semantrace-icon.png" alt="Semantrace Icon" class="brand-icon" />
+        <span>Semantrace</span>
+        <span class="brand-badge">Whitepaper</span>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#abstract" class="nav-link">Abstract</a></li>
+        <li><a href="#1-the-program-analysis-trilemma" class="nav-link">Trilemma</a></li>
+        <li><a href="#2-high-level-architectural-paradigm" class="nav-link">Architecture</a></li>
+        <li><a href="#3-cyber-physical-attack-surface-modeling" class="nav-link">Cyber-Physical</a></li>
+        <li><a href="#4-closed-loop-rule-distillation" class="nav-link">Distillation</a></li>
+        <li><a href="#5-empirical-evaluation--benchmarks" class="nav-link">Benchmarks</a></li>
+        <li><a href="#citation" class="nav-link">Citation</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <!-- Theme Switcher Toggle -->
+        <button id="theme-toggle" class="btn-icon" aria-label="Toggle Color Theme" title="Toggle dark/light mode">
+          <svg id="moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <svg id="sun-icon" style="display: none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </button>
+
+        <!-- GitHub Link Button -->
+        <a href="https://github.com/semantrace/semantrace.github.io" target="_blank" rel="noopener noreferrer" class="btn-github">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"></path>
+          </svg>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Unified Layout Grid: Centered Hero Spanning Grid + Article/TOC -->
+  <div class="layout-wrapper">
+    <!-- Main Content Stream (Contains Hero + Article Body) -->
+    <div class="hero-wrapper">
+<div class="hero-banner">
+<div class="hero-logo-wrapper">
+<img src="assets/semantrace-logo.png" alt="Semantrace Logo" class="hero-logo-img" />
+</div>
+<div class="hero-meta-badges">
+<span class="meta-badge highlight">Black Hat India 2026</span>
+<span class="meta-badge">Technical White Paper</span>
+<span class="meta-badge">November 2026</span>
+<span class="meta-badge">Cloud &amp; Embedded Systems</span>
+</div>
+<h1 class="hero-title">
+<span class="gradient-text">Semantrace</span>: Killing the 91% Noise
+</h1>
+<p class="hero-subtitle">
+A Taint-Aware RAG Pipeline That Turns Static Analysis Into an Intelligent Vulnerability Hunter for Cloud and Embedded Systems
+</p>
+<div class="hero-byline">
+<strong>Shaunak Chattopadhyay</strong><br>
+<a href="https://semantrace.github.io">semantrace.github.io</a>
+</div>
+<div class="hero-actions">
+<a href="#abstract" class="btn-action btn-primary">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+Read Whitepaper
+</a>
+<a href="#5-empirical-evaluation--benchmarks" class="btn-action btn-secondary">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+Benchmarks
+</a>
+<a href="#citation" class="btn-action btn-secondary">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+Cite Paper
+</a>
+</div>
+</div>
+<div class="briefing-card" id="black-hat-briefing">
+<div class="briefing-header">
+<span class="briefing-pill">Black Hat India • Official Briefing</span>
+<span class="briefing-title">Briefing Session &amp; Research Presentation</span>
+</div>
+<p>
+This technical whitepaper outlines the architecture and empirical findings presented at <strong>Black Hat India</strong> in the briefing session:
+<strong><em>"Killing the 91% Noise: A Taint-Aware RAG Pipeline That Turns Static Analysis Into an Intelligent Vulnerability Hunter for Cloud and Embedded Systems"</em></strong> (Speaker: <strong>Shaunak Chattopadhyay</strong>).
+</p>
+<p>
+The session demonstrates how traditional static analysis false-positive noise can be systematically eliminated by combining deterministic boundary gating with bounded neural verification, modeling cyber-physical interfaces (CAN bus, BLE GATT, UART ISRs, OCPP) as first-class taint surfaces. Briefing slide decks, demonstration walkthroughs, and research materials accompany the release.
+</p>
+<div style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-top: 1rem;">
+<a href="https://www.blackhat-india.com/briefings-schedule?day=friday#killing-the-91-noise-a-taint-aware-rag-pipeline-that-turns-static-analysis-into-an-intelligent-vulnerability-hunter-for-cloud-and-embedded-systems-50020" target="_blank" rel="noopener noreferrer" class="btn-action btn-primary" style="padding: 0.45rem 1rem; font-size: 0.84rem;">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+View on Official Black Hat India Schedule ↗
+</a>
+<span style="font-size: 0.82rem; color: var(--text-muted); font-family: var(--font-mono);">Session ID: 50020 • Friday Track</span>
+</div>
+</div>
+<div class="stat-grid">
+<div class="stat-card">
+<div class="stat-value stat-cyan">91%</div>
+<div class="stat-label">Static Noise Slashed</div>
+<div class="stat-sub">From raw AST alerts to verified exploitability</div>
+</div>
+<div class="stat-card">
+<div class="stat-value stat-emerald">100%</div>
+<div class="stat-label">Critical CWE Recall</div>
+<div class="stat-sub">CWE-122 Heap Overflow &amp; CWE-297 TLS</div>
+</div>
+<div class="stat-card">
+<div class="stat-value stat-indigo">180</div>
+<div class="stat-label">Public CVEs Benchmarked</div>
+<div class="stat-sub">Official cURL Security Suite (2000–2026)</div>
+</div>
+<div class="stat-card">
+<div class="stat-value stat-amber">$0.00</div>
+<div class="stat-label">Clean Commit Overhead</div>
+<div class="stat-sub">Deterministic gating exits on clean PRs</div>
+</div>
+</div>
+<hr class="section-divider" />
+</div>
+<main class="main-article content-body">
+<h2 id="abstract">Abstract</h2>
+<div class="abstract-box">
+<p>
+Static Application Security Testing (SAST) has historically been governed by an unyielding trade-off: fast, deterministic static pattern matching produces unmanageable false-positive rates (frequently reaching 70% to over 90%), while deep formal methods (e.g., interprocedural path analysis and model checking) suffer from state-space explosions and steep computational overhead. Recent efforts to deploy Large Language Models (LLMs) as zero-shot code auditors attempt to bypass these limits, but introduce critical failure modes: high hallucination rates, non-deterministic outputs, and token costs that scale linearly with codebase size ($\mathcal{O}(N)$). Furthermore, existing analysis engines are architected almost exclusively for POSIX and web-application environments, leaving cyber-physical, bare-metal, and embedded protocol boundaries unmodeled.
+</p>
+<p>
+This whitepaper presents <strong>Semantrace</strong>, a cascaded neuro-symbolic security analysis architecture designed to resolve the <em>Precision–Recall–Cost Trilemma</em>. Semantrace establishes a gated pipeline that inverts traditional AI-for-code paradigms: rather than using probabilistic models to discover bugs, deterministic symbolic automata act as strict, cost-bounding gates ($\mathcal{O}(K)$ candidate witnesses), while a specialized neural reasoning engine acts as a bounded semantic oracle to prove or refute reachability and exploitability. Semantrace models cyber-physical inputs (CAN bus, BLE GATT, UART ISRs, OCPP) as first-class taint boundaries, constructs topology-aware call-graph slices to condition LLM reasoning, and mathematically computes CVSS 3.1 scores from discrete categorical vectors. Across benchmark evaluations on the official cURL security corpus (180 historical CVEs) and open-source embedded targets, Semantrace maintains high recall while eliminating LLM inference spend on over 75% of clean commits.
+</p>
+</div>
+<hr />
+<h2 id="1-the-program-analysis-trilemma">1. The Program Analysis Trilemma</h2>
+<p>Automated vulnerability discovery tools are fundamentally constrained by Rice's Theorem: any non-trivial semantic property of a computer program is formally undecidable. Production security teams must navigate the <strong>Precision–Recall–Cost Trilemma</strong>:</p>
+<pre><code>                       High Recall
+                    (Syntactic SAST)
+                          ▲
+                         / \
+                        /   \
+                       /     \
+                      /       \
+        High Precision ───────── Low Compute Cost
+       (Deep SMT / LLM)         (Deterministic Gates)
+</code></pre>
+<ol>
+<li><strong>Syntactic Static Analysis (Regex / Heuristic AST):</strong> Fast, easily parallelized, and provides broad recall. However, lack of data-flow semantics and path-sensitivity results in false-positive rates frequently exceeding 70–90%, inducing alert fatigue and broken developer trust.</li>
+<li><strong>Deep Semantic Analysis (Datalog / Model Checking / SMT):</strong> Sound and precise, but computationally prohibitive on large codebases. Requires complete, buildable compilation units—a condition frequently unmet in distributed microservices and heterogeneous firmware toolchains.</li>
+<li><strong>Pure Neural Scanning (LLM-as-a-Judge):</strong> Demonstrates high semantic intuition on local code blocks, but exhibits unbounded hallucinations, misses global context, and induces unsustainable cloud inference costs when processing large repositories or high-velocity CI/CD pipelines.</li>
+</ol>
+<h3>The Cyber-Physical Blind Spot</h3>
+<p>Beyond computational complexity, existing SAST tooling suffers from an acute domain blind spot: <strong>embedded and cyber-physical systems</strong>. Mainstream scanners assume POSIX interfaces (e.g., <code>argv</code>, <code>stdin</code>, socket descriptors, HTTP endpoints). They possess no formal models for:</p>
+<ul>
+<li>Hardware registers and Memory-Mapped I/O (MMIO).</li>
+<li>Industrial and automotive serial buses (CAN/CAN-FD, UART, SPI, I2C).</li>
+<li>Real-Time Operating System (RTOS) task scheduling and Interrupt Service Routines (ISRs).</li>
+<li>Short-range wireless and IoT transport specifications (BLE GATT tables, OCPP, MQTT).</li>
+</ul>
+<p>When firmware is audited with conventional web-oriented tooling, critical hardware-boundary vulnerabilities are either missed entirely or misclassified.</p>
+<hr />
+<h2 id="2-high-level-architectural-paradigm">2. High-Level Architectural Paradigm</h2>
+<p>Semantrace is founded on a core architectural principle: <strong>Symbolic models must govern search and cost; neural models must govern semantic verification.</strong></p>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                    The Cascaded Semantrace Pipeline                         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  [Codebase / Commit Diff]                                                   │
+│           │                                                                 │
+│           ▼                                                                 │
+│  ┌─────────────────┐                                                       │
+│  │ 1. Static Gate  │ ── (0 Hits) ──► [Exit: $0 Inference Cost]              │
+│  └────────┬────────┘                                                       │
+│           │ (&gt;0 Hits)                                                       │
+│           ▼                                                                 │
+│  ┌─────────────────┐                                                       │
+│  │ 2. AST Slicing  │ ──► Multi-Language Syntax Boundary Extraction          │
+│  └────────┬────────┘                                                       │
+│           │                                                                 │
+│           ▼                                                                 │
+│  ┌─────────────────┐                                                       │
+│  │ 3. Topology &amp;   │ ──► Backward Call Reachability (Sink ◄── Source)       │
+│  │    Taint Path   │                                                        │
+│  └────────┬────────┘                                                       │
+│           │                                                                 │
+│           ▼                                                                 │
+│  ┌─────────────────┐                                                       │
+│  │ 4. Vectorized   │ ──► Semantic Neighborhood Context (Local Embeddings)   │
+│  │    RAG Context  │                                                        │
+│  └────────┬────────┘                                                       │
+│           │                                                                 │
+│           ▼                                                                 │
+│  ┌─────────────────┐                                                       │
+│  │ 5. Neural Prove │ ──► Bounded Reasoning Oracle + Target Verification     │
+│  └────────┬────────┘                                                       │
+│           │                                                                 │
+│           ▼                                                                 │
+│  ┌─────────────────┐                                                       │
+│  │ 6. Mathematical │ ──► Deterministic CVSS Metric Grounding                │
+│  │    Grounding    │                                                        │
+│  └─────────────────┘                                                       │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+</code></pre>
+<p>Rather than burdening an LLM with the unbounded task of ingesting an entire codebase to <em>find</em> vulnerabilities, Semantrace partitions the problem into a strictly ordered, multi-stage pipeline:</p>
+<h3>Stage 1: Deterministic Cost Gating ($\mathcal{O}(N)$)</h3>
+<p>A high-throughput signature engine screens incoming files using compiled, language-scoped syntactic patterns. If an incoming commit contains zero suspect constructs, the analysis terminates immediately. For typical production codebases where ~75% of commits do not introduce suspect constructs, <strong>total cloud inference cost is precisely $0.00</strong>.</p>
+<h3>Stage 2: Syntactic Boundary Slicing</h3>
+<p>Files containing candidate witnesses undergo boundary slicing across 14 languages. Individual function boundaries, parameter declarations, caller hierarchies, and enclosing scope blocks are isolated from surrounding file noise.</p>
+<h3>Stage 3: Topological Reachability Analysis</h3>
+<p>A call-graph topology maps inter-function dependencies. When a candidate hit resides within a known dangerous sink, backward reachability analysis traverses inbound call edges to identify whether an execution path exists originating from an external boundary (untrusted source), bounded against depth caps to prevent path-explosion in cyclic graphs.</p>
+<h3>Stage 4: Structural Context Retrieval</h3>
+<p>To enable the verifier to understand project-specific idioms, localized embeddings retrieve structurally and functionally relevant context from the broader repository, strictly bounded by AST function definitions rather than sliding text windows.</p>
+<h3>Stage 5: Bounded Exploitability Verification</h3>
+<p>The candidate site, topological call path, structural context, and target source lines are provided to a high-capacity reasoning model acting under strict operational mandates:</p>
+<ul>
+<li><strong>Evidence-Based Mandate:</strong> The model is prohibited from reporting speculative flaws; it must cite concrete source evidence.</li>
+<li><strong>Bounded Target Verification:</strong> The model evaluates whether the identified execution path is genuinely reachable and whether sanitization, bounds checks, or state guards prevent exploitability.</li>
+</ul>
+<h3>Stage 6: Formal Severity Scoring</h3>
+<p>To avoid non-deterministic and hallucinated severity metrics, scoring is decoupled from neural generation:</p>
+<ol>
+<li>The neural engine answers discrete categorical parameters (Attack Vector, Complexity, Privileges, User Interaction, Scope, Impact metrics).</li>
+<li>A deterministic evaluator computes the formal CVSS 3.1 base score according to FIRST specifications.</li>
+</ol>
+<hr />
+<h2 id="3-cyber-physical-attack-surface-modeling">3. Cyber-Physical Attack Surface Modeling</h2>
+<p>Semantrace provides specialized modeling for embedded firmware, IoT, and industrial protocols. In this paradigm, taint sources are not limited to standard user input fields:</p>
+<pre><code>[Hardware / Bus Source] ──► [Driver Ring Buffer / ISR] ──► [Parsing Logic] ──► [Control / Memory Sink]
+  (e.g., CAN Frame,           (Unbounded copy,            (Missing length        (Actuator state change,
+   BLE GATT Write)             race condition)             validation)            Buffer overflow)
+</code></pre>
+<h3>1. Serial &amp; Fieldbus Architectures (CAN / UART / SPI / I2C)</h3>
+<ul>
+<li><strong>Untrusted Frame Injection:</strong> Identifies missing Acceptance Filters on CAN/CAN-FD controllers that allow arbitrary message injection.</li>
+<li><strong>Race Conditions in ISR Buffers:</strong> Flags unbounded serial reads in interrupt handlers lacking hardware flow-control or timeout boundaries.</li>
+<li><strong>Bus Collision &amp; Timing Flaws:</strong> Detects clock-stretch manipulation vulnerabilities in I2C peripheral handling.</li>
+</ul>
+<h3>2. Wireless Interfaces &amp; Stack Vulnerabilities (BLE / WiFi)</h3>
+<ul>
+<li><strong>GATT Characteristic Access Violations:</strong> Identifies unauthenticated read/write attributes exposed without Security Mode 1 Level 3/4 encryption.</li>
+<li><strong>Pairing Downgrades:</strong> Flags implementations allowing &quot;Just Works&quot; legacy pairing when out-of-band (OOB) or passkey entry is required.</li>
+<li><strong>Probe &amp; Management Frame Injection:</strong> Discovers PMKID leakage and unvalidated 802.11 management frame handlers.</li>
+</ul>
+<h3>3. Hardware Debug &amp; Boot Integrity</h3>
+<ul>
+<li><strong>Exposed Debug Artifacts:</strong> Verifies that production builds have permanently disabled SWD/JTAG interfaces and UART debug consoles.</li>
+<li><strong>Cryptographic Boot Chains:</strong> Audits firmware update routines for unvalidated downgrade paths, signature-bypass flaws, and plaintext OTA transfers.</li>
+</ul>
+<h3>4. Distributed Energy &amp; Charging Protocols (OCPP / MQTT)</h3>
+<ul>
+<li><strong>Smart Charging Tampering:</strong> Scans Open Charge Point Protocol (OCPP 1.6/2.0.1) implementations for insecure WebSocket endpoints (<code>ws://</code> vs <code>wss://</code>), unauthorized <code>DataTransfer</code> frame injections, and unauthenticated transaction control.</li>
+</ul>
+<hr />
+<h2 id="4-closed-loop-rule-distillation">4. Closed-Loop Rule Distillation</h2>
+<p>A recurring limitation of static analysis is that rule sets require labor-intensive manual authoring. Semantrace addresses this via an automated <strong>Symbolic Distillation Loop</strong>:</p>
+<pre><code>[Candidate Code] ──► [Static Gate] ──► [Neural Verifier]
+                            ▲                  │
+                            │             (Discovers Novel
+                            │              Vulnerability)
+                            │                  ▼
+                    [Auto-Rule Store] ◄── [Symbolic Rule
+                    (Regex / AST Query)   Synthesis Engine]
+</code></pre>
+<ol>
+<li><strong>Gap Discovery:</strong> When the neural reasoning engine verifies a vulnerability that bypassed initial static rule categories during baseline audits, the finding is flagged as a coverage gap.</li>
+<li><strong>Rule Synthesis:</strong> A meta-evaluator synthesizes candidate symbolic patterns targeting the underlying structural flaw.</li>
+<li><strong>Automated Validation:</strong> The candidate rule is tested across the repository and regression test suites to verify match accuracy, termination guarantees, and absence of excessive generalization.</li>
+<li><strong>Promotion:</strong> Validated patterns are committed to the symbolic rule store, permanently expanding static coverage and eliminating future LLM token consumption for that vulnerability class.</li>
+</ol>
+<hr />
+<h2 id="5-empirical-evaluation--benchmarks">5. Empirical Evaluation & Benchmarks</h2>
+<p>To evaluate vulnerability discovery accuracy, recall, and operational noise reduction, the Semantrace architecture was benchmarked across the public <strong>cURL Security Database</strong> (historical CVEs evaluated at vulnerable commit SHAs) and open-source cyber-physical reference targets.</p>
+<h3>Real-World CVE Benchmark: The cURL Security Corpus (180 CVEs)</h3>
+<p>Evaluated against <strong>180 historical CVEs spanning 2000–2026</strong> from the official cURL security advisory database. Each target was audited strictly at the vulnerable commit SHA to assess whether the cascaded pipeline discovers the root vulnerability:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Vulnerability Category</th>
+<th style="text-align:center">Evaluated CVEs</th>
+<th style="text-align:center">Semantrace Detected</th>
+<th style="text-align:center">Recall Rate</th>
+<th style="text-align:left">Primary Verification Path</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Heap Buffer Overflow (CWE-122)</strong></td>
+<td style="text-align:center">8</td>
+<td style="text-align:center">8</td>
+<td style="text-align:center"><span class="table-badge table-badge-success">100%</span></td>
+<td style="text-align:left">AST Boundary + Neural Prove</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Certificate Validation Bypass (CWE-297)</strong></td>
+<td style="text-align:center">7</td>
+<td style="text-align:center">7</td>
+<td style="text-align:center"><span class="table-badge table-badge-success">100%</span></td>
+<td style="text-align:left">Taint Reachability to TLS Sink</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>TLS / SSL Misconfigurations (CWE-295)</strong></td>
+<td style="text-align:center">13</td>
+<td style="text-align:center">12</td>
+<td style="text-align:center"><span class="table-badge table-badge-highlight">92.3%</span></td>
+<td style="text-align:left">Backward Call-Graph Traversal</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Use-After-Free (CWE-416)</strong></td>
+<td style="text-align:center">8</td>
+<td style="text-align:center">7</td>
+<td style="text-align:center"><span class="table-badge table-badge-highlight">87.5%</span></td>
+<td style="text-align:left">Bounded Semantic Reasoning</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Integer Overflow / Wrap (CWE-190)</strong></td>
+<td style="text-align:center">11</td>
+<td style="text-align:center">9</td>
+<td style="text-align:center"><span class="table-badge table-badge-highlight">81.8%</span></td>
+<td style="text-align:left">Arithmetic Path Reachability</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Null Pointer Dereference (CWE-476)</strong></td>
+<td style="text-align:center">14</td>
+<td style="text-align:center">12</td>
+<td style="text-align:center"><span class="table-badge table-badge-highlight">85.7%</span></td>
+<td style="text-align:left">Scope Boundary Extraction</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Protocol Parsing &amp; State Flaws (Misc)</strong></td>
+<td style="text-align:center">119</td>
+<td style="text-align:center">86</td>
+<td style="text-align:center"><span class="table-badge table-badge-highlight">72.3%</span></td>
+<td style="text-align:left">Multi-Stage Verification Pipeline</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Overall Benchmark Suite</strong></td>
+<td style="text-align:center"><strong>180</strong></td>
+<td style="text-align:center"><strong>141</strong></td>
+<td style="text-align:center"><span class="table-badge table-badge-success">78.3%</span></td>
+<td style="text-align:left"><strong>Cascaded Neuro-Symbolic</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Key Takeaway:</strong> Semantrace achieved <strong>100% recall on critical memory safety (CWE-122)</strong> and <strong>certificate validation (CWE-297)</strong> flaws in the cURL corpus, demonstrating that bounded semantic verification successfully confirms complex exploitability paths without the state explosion of formal model checkers.</p>
+</blockquote>
+<h3>Cyber-Physical &amp; Embedded Protocol Evaluation</h3>
+<p>In evaluations across open-source embedded stacks (Linux SocketCAN drivers, RTOS serial ISRs, and open OCPP 1.6/2.0.1 implementations):</p>
+<ul>
+<li><strong>Hardware Frame Injection:</strong> Correctly identified missing acceptance filters on CAN controllers allowing frame spoofing.</li>
+<li><strong>ISR Race Conditions:</strong> Flagged unbounded ring-buffer writes in serial interrupt handlers lacking flow-control boundaries.</li>
+<li><strong>Cleartext Transport:</strong> Caught insecure WebSocket transport (<code>ws://</code>) in charging point communications.</li>
+</ul>
+<h3>Continuous Integration Efficiency &amp; Noise Slicing</h3>
+<p>In continuous integration environments, Semantrace exhibits radical cost and signal-to-noise advantages over monolithic AI agents:</p>
+<ul>
+<li><strong>Clean Commit Bypassing:</strong> ~75% of commits trigger zero static witnesses, incurring precisely <strong>$0.00 cloud inference overhead</strong>.</li>
+<li><strong>Per-Vulnerability Audit Cost:</strong> Average verification cost is bounded to <strong>$0.02 – $0.05 per commit scan</strong>, compared to $0.70 – $2.00+ for unbounded agentic scans.</li>
+<li><strong>Noise Slicing:</strong> By requiring proof of reachability from untrusted sources to sensitive sinks, Semantrace cuts through the industry baseline of 70–91% false-positive static noise, presenting developers only with verified, exploitable witnesses.</li>
+</ul>
+<hr />
+<h2 id="6-security--operational-considerations">6. Security & Operational Considerations</h2>
+<p>A security tool must itself adhere to rigorous defense-in-depth principles:</p>
+<ol>
+<li><strong>Isolated Execution Environments:</strong> Code extraction, AST generation, and symbolic scanning are sandboxed to prevent untrusted code execution during analysis.</li>
+<li><strong>Deterministic Cryptographic Fingerprinting:</strong> Findings are identified using normalized AST path-and-symbol hashes rather than raw line numbers, ensuring benign upstream edits do not trigger duplicate alerts or reset triage state.</li>
+<li><strong>Stateless Neural Ingestion:</strong> Source code evaluated by neural verifiers is processed via private, zero-retention enterprise endpoints with no data persistence for model training.</li>
+</ol>
+<hr />
+<h2 id="7-conclusion">7. Conclusion</h2>
+<p>Semantrace demonstrates that the future of automated application security lies in a <strong>cascaded neuro-symbolic architecture</strong>: leveraging deterministic automata for computational speed, broad recall, and zero-cost guarantees on clean code, paired with bounded neural models for contextual reasoning and false-positive reduction.</p>
+<hr />
+<h3 id="citation">Citation</h3>
+<p>If you reference Semantrace in your research or cite the Black Hat India presentation, please use the following BibTeX entry:</p>
+<pre><code class="language-bibtex">@inproceedings{chattopadhyay2026killingnoise,
+  title        = {Killing the 91% Noise: A Taint-Aware RAG Pipeline That Turns Static Analysis Into an Intelligent Vulnerability Hunter for Cloud and Embedded Systems},
+  author       = {Shaunak Chattopadhyay},
+  booktitle    = {Black Hat India Briefings},
+  year         = {2026},
+  organization = {Black Hat},
+  note         = {Session ID: 50020, Friday Track},
+  url          = {https://www.blackhat-india.com/briefings-schedule?day=friday#killing-the-91-noise-a-taint-aware-rag-pipeline-that-turns-static-analysis-into-an-intelligent-vulnerability-hunter-for-cloud-and-embedded-systems-50020}
+}
+</code></pre>
+</main>
+
+
+    <!-- Table of Contents Sticky Sidebar -->
+    <aside class="toc-sidebar">
+      <div class="toc-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+        <span>On This Page</span>
+      </div>
+      <nav id="toc-nav">
+        <!-- Dynamically generated via JS -->
+      </nav>
+    </aside>
+  </div>
+
+  <!-- Back to Top Button -->
+  <button id="back-to-top" aria-label="Back to Top" title="Back to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+  </button>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <img src="assets/semantrace-icon.png" alt="Semantrace Icon" width="24" height="24" style="border-radius: 4px;" />
+        <div class="footer-text">
+          <strong>Shaunak Chattopadhyay</strong> • Technical White Paper<br>
+          Killing the 91% Noise: A Taint-Aware RAG Pipeline for Cloud &amp; Embedded Systems
+        </div>
+      </div>
+      <ul class="footer-links">
+        <li><a href="https://github.com/semantrace/semantrace.github.io" target="_blank" rel="noopener">Repository</a></li>
+        <li><a href="#citation">Citation</a></li>
+        <li><a href="https://semantrace.github.io">semantrace.github.io</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <!-- Interactive Scripts (Theme, TOC, Reading Progress, Copy Buttons, Diagram Cards) -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Theme Management (Dark / Light)
+      const themeToggle = document.getElementById('theme-toggle');
+      const moonIcon = document.getElementById('moon-icon');
+      const sunIcon = document.getElementById('sun-icon');
+      const htmlEl = document.documentElement;
+
+      const savedTheme = localStorage.getItem('semantrace-theme') || 
+        (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+      
+      setTheme(savedTheme);
+
+      themeToggle.addEventListener('click', () => {
+        const currentTheme = htmlEl.getAttribute('data-theme');
+        const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        setTheme(nextTheme);
+      });
+
+      function setTheme(theme) {
+        htmlEl.setAttribute('data-theme', theme);
+        localStorage.setItem('semantrace-theme', theme);
+        if (theme === 'dark') {
+          moonIcon.style.display = 'block';
+          sunIcon.style.display = 'none';
+        } else {
+          moonIcon.style.display = 'none';
+          sunIcon.style.display = 'block';
+        }
+      }
+
+      // 2. Reading Progress Indicator & Back to Top Visibility
+      const progressBar = document.getElementById('progress-bar');
+      const backToTopBtn = document.getElementById('back-to-top');
+
+      window.addEventListener('scroll', () => {
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+        progressBar.style.width = progress + '%';
+
+        if (scrollTop > 400) {
+          backToTopBtn.classList.add('visible');
+        } else {
+          backToTopBtn.classList.remove('visible');
+        }
+      });
+
+      backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      // 3. Dynamic Table of Contents Generation
+      const article = document.querySelector('.main-article');
+      const tocNav = document.getElementById('toc-nav');
+      if (article && tocNav) {
+        const headings = article.querySelectorAll('h2, h3');
+        if (headings.length > 0) {
+          const ul = document.createElement('ul');
+          ul.className = 'toc-list';
+          let currentH2Li = null;
+          let currentH3Ul = null;
+
+          headings.forEach((heading) => {
+            if (!heading.id) {
+              heading.id = heading.textContent
+                .toLowerCase()
+                .trim()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+            }
+
+            const li = document.createElement('li');
+            li.className = 'toc-item';
+            const a = document.createElement('a');
+            a.className = 'toc-link';
+            a.href = '#' + heading.id;
+            a.textContent = heading.textContent.replace(/^[\d.]+\s*/, '');
+
+            if (heading.tagName.toLowerCase() === 'h2') {
+              li.appendChild(a);
+              ul.appendChild(li);
+              currentH2Li = li;
+              currentH3Ul = null;
+            } else if (heading.tagName.toLowerCase() === 'h3') {
+              if (currentH2Li) {
+                if (!currentH3Ul) {
+                  currentH3Ul = document.createElement('ul');
+                  currentH3Ul.className = 'toc-sublist';
+                  currentH2Li.appendChild(currentH3Ul);
+                }
+                li.appendChild(a);
+                currentH3Ul.appendChild(li);
+              } else {
+                li.appendChild(a);
+                ul.appendChild(li);
+              }
+            }
+          });
+          tocNav.appendChild(ul);
+
+          const observerOptions = {
+            root: null,
+            rootMargin: '0px 0px -65% 0px',
+            threshold: 0
+          };
+
+          const tocLinks = tocNav.querySelectorAll('.toc-link');
+          const headingObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                const id = entry.target.id;
+                tocLinks.forEach((link) => {
+                  if (link.getAttribute('href') === '#' + id) {
+                    link.classList.add('active');
+                  } else {
+                    link.classList.remove('active');
+                  }
+                });
+              }
+            });
+          }, observerOptions);
+
+          headings.forEach((h) => headingObserver.observe(h));
+        }
+      }
+
+      // 4. Wrap Tables for Responsiveness
+      article.querySelectorAll('table').forEach((table) => {
+        if (!table.parentElement.classList.contains('table-container')) {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'table-container';
+          table.parentNode.insertBefore(wrapper, table);
+          wrapper.appendChild(table);
+        }
+      });
+
+      // 5. Code Block Copy Buttons & Diagram Window Enhancement
+      article.querySelectorAll('pre').forEach((pre) => {
+        const code = pre.querySelector('code');
+        const text = code ? code.innerText : pre.innerText;
+
+        const isDiagram = text.includes('┌──') || text.includes('High Recall') || text.includes('[Hardware') || text.includes('Symbolic Distillation');
+
+        // Create Copy Button
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'copy-btn';
+        copyBtn.innerHTML = `
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          <span>Copy</span>
+        `;
+
+        copyBtn.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(text);
+            copyBtn.classList.add('copied');
+            copyBtn.innerHTML = `
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span>Copied!</span>
+            `;
+            setTimeout(() => {
+              copyBtn.classList.remove('copied');
+              copyBtn.innerHTML = `
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                <span>Copy</span>
+              `;
+            }, 2000);
+          } catch (err) {
+            console.error('Clipboard copy failed:', err);
+          }
+        });
+
+        if (isDiagram && !pre.closest('.diagram-container')) {
+          const container = document.createElement('div');
+          container.className = 'diagram-container';
+
+          let diagTitle = 'architecture-spec // neuro-symbolic';
+          if (text.includes('High Recall')) diagTitle = 'program-analysis // trilemma';
+          else if (text.includes('Semantrace Pipeline')) diagTitle = 'cascaded-pipeline // flow-spec';
+          else if (text.includes('Hardware / Bus')) diagTitle = 'cyber-physical // taint-surface';
+          else if (text.includes('Symbolic Distillation')) diagTitle = 'closed-loop // rule-distillation';
+
+          const header = document.createElement('div');
+          header.className = 'diagram-header';
+          header.innerHTML = `
+            <div class="diagram-header-left">
+              <div class="diagram-dots">
+                <span class="diagram-dot dot-red"></span>
+                <span class="diagram-dot dot-yellow"></span>
+                <span class="diagram-dot dot-green"></span>
+              </div>
+              <span class="diagram-title">${diagTitle}</span>
+            </div>
+            <div class="diagram-header-right"></div>
+          `;
+
+          header.querySelector('.diagram-header-right').appendChild(copyBtn);
+          pre.classList.add('diagram-body');
+          pre.parentNode.insertBefore(container, pre);
+          container.appendChild(header);
+          container.appendChild(pre);
+        } else {
+          // Regular Pre Block (BibTeX, Code)
+          pre.appendChild(copyBtn);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
