@@ -6,9 +6,6 @@ description: "Static Analysis Into an Intelligent Vulnerability Hunter (SAIHNT) 
 
 <div class="hero-wrapper">
 <div class="hero-banner">
-<div class="hero-logo-wrapper">
-<img src="assets/semantrace-logo.png" alt="SAIHNT Logo" class="hero-logo-img" />
-</div>
 <div class="hero-meta-badges">
 <span class="meta-badge highlight">Black Hat India 2026</span>
 <span class="meta-badge">Technical White Paper</span>
