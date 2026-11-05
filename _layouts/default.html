@@ -1288,8 +1288,8 @@
   <header class="site-header">
     <div class="nav-container">
       <a href="{{ '/' | relative_url }}" class="brand-link">
-        <img src="{{ '/assets/semantrace-icon.png' | relative_url }}" alt="Semantrace Icon" class="brand-icon" />
-        <span>Semantrace</span>
+        <img src="{{ '/assets/semantrace-icon.png' | relative_url }}" alt="SAIHNT Icon" class="brand-icon" />
+        <span>SAIHNT</span>
         <span class="brand-badge">Whitepaper</span>
       </a>
 
@@ -1368,10 +1368,10 @@
   <footer class="site-footer">
     <div class="footer-container">
       <div class="footer-brand">
-        <img src="{{ '/assets/semantrace-icon.png' | relative_url }}" alt="Semantrace Icon" width="24" height="24" style="border-radius: 4px;" />
+        <img src="{{ '/assets/semantrace-icon.png' | relative_url }}" alt="SAIHNT Icon" width="24" height="24" style="border-radius: 4px;" />
         <div class="footer-text">
           <strong>Shaunak Chattopadhyay</strong> • Technical White Paper<br>
-          Killing the 91% Noise: A Taint-Aware RAG Pipeline for Cloud &amp; Embedded Systems
+          SAIHNT: Static Analysis Into an Intelligent Vulnerability Hunter
         </div>
       </div>
       <ul class="footer-links">
@@ -1391,7 +1391,7 @@
       const sunIcon = document.getElementById('sun-icon');
       const htmlEl = document.documentElement;
 
-      const savedTheme = localStorage.getItem('semantrace-theme') || 
+      const savedTheme = localStorage.getItem('saihnt-theme') || 
         (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
       
       setTheme(savedTheme);
@@ -1404,7 +1404,7 @@
 
       function setTheme(theme) {
         htmlEl.setAttribute('data-theme', theme);
-        localStorage.setItem('semantrace-theme', theme);
+        localStorage.setItem('saihnt-theme', theme);
         if (theme === 'dark') {
           moonIcon.style.display = 'block';
           sunIcon.style.display = 'none';
@@ -1569,7 +1569,7 @@
 
           let diagTitle = 'architecture-spec // neuro-symbolic';
           if (text.includes('High Recall')) diagTitle = 'program-analysis // trilemma';
-          else if (text.includes('Semantrace Pipeline')) diagTitle = 'cascaded-pipeline // flow-spec';
+          else if (text.includes('SAIHNT Pipeline')) diagTitle = 'cascaded-pipeline // flow-spec';
           else if (text.includes('Hardware / Bus')) diagTitle = 'cyber-physical // taint-surface';
           else if (text.includes('Symbolic Distillation')) diagTitle = 'closed-loop // rule-distillation';
 

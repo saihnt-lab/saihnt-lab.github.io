@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Semantrace: Killing the 91% Noise | Black Hat India Briefing</title>
-  <meta name="description" content="A Taint-Aware RAG Pipeline That Turns Static Analysis Into an Intelligent Vulnerability Hunter for Cloud and Embedded Systems" />
+  <title>SAIHNT: Killing the 91% Noise | Black Hat India Briefing</title>
+  <meta name="description" content="Static Analysis Into an Intelligent Vulnerability Hunter (SAIHNT) - A Taint-Aware RAG Pipeline for Cloud and Embedded Systems" />
   
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="assets/semantrace-icon.png" />
@@ -12,13 +12,13 @@
 
   <!-- OpenGraph / Social Media -->
   <meta property="og:type" content="article" />
-  <meta property="og:title" content="Semantrace: Killing the 91% Noise | Black Hat India Briefing" />
-  <meta property="og:description" content="A Taint-Aware RAG Pipeline That Turns Static Analysis Into an Intelligent Vulnerability Hunter for Cloud and Embedded Systems" />
+  <meta property="og:title" content="SAIHNT: Killing the 91% Noise | Black Hat India Briefing" />
+  <meta property="og:description" content="Static Analysis Into an Intelligent Vulnerability Hunter (SAIHNT) - A Taint-Aware RAG Pipeline for Cloud and Embedded Systems" />
   <meta property="og:image" content="assets/semantrace-logo.png" />
   <meta property="og:url" content="https://semantrace.github.io" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Semantrace: Killing the 91% Noise | Black Hat India Briefing" />
-  <meta name="twitter:description" content="A Taint-Aware RAG Pipeline That Turns Static Analysis Into an Intelligent Vulnerability Hunter for Cloud and Embedded Systems" />
+  <meta name="twitter:title" content="SAIHNT: Killing the 91% Noise | Black Hat India Briefing" />
+  <meta name="twitter:description" content="Static Analysis Into an Intelligent Vulnerability Hunter (SAIHNT) - A Taint-Aware RAG Pipeline for Cloud and Embedded Systems" />
   <meta name="twitter:image" content="assets/semantrace-logo.png" />
 
   <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
@@ -1288,8 +1288,8 @@
   <header class="site-header">
     <div class="nav-container">
       <a href="" class="brand-link">
-        <img src="assets/semantrace-icon.png" alt="Semantrace Icon" class="brand-icon" />
-        <span>Semantrace</span>
+        <img src="assets/semantrace-icon.png" alt="SAIHNT Icon" class="brand-icon" />
+        <span>SAIHNT</span>
         <span class="brand-badge">Whitepaper</span>
       </a>
 
@@ -1339,7 +1339,7 @@
     <div class="hero-wrapper">
 <div class="hero-banner">
 <div class="hero-logo-wrapper">
-<img src="assets/semantrace-logo.png" alt="Semantrace Logo" class="hero-logo-img" />
+<img src="assets/semantrace-logo.png" alt="SAIHNT Logo" class="hero-logo-img" />
 </div>
 <div class="hero-meta-badges">
 <span class="meta-badge highlight">Black Hat India 2026</span>
@@ -1348,7 +1348,7 @@
 <span class="meta-badge">Cloud &amp; Embedded Systems</span>
 </div>
 <h1 class="hero-title">
-<span class="gradient-text">Semantrace</span>: Killing the 91% Noise
+<span class="gradient-text">SAIHNT</span>: Killing the 91% Noise
 </h1>
 <p class="hero-subtitle">
 A Taint-Aware RAG Pipeline That Turns Static Analysis Into an Intelligent Vulnerability Hunter for Cloud and Embedded Systems
@@ -1423,7 +1423,7 @@ View on Official Black Hat India Schedule ↗
 Static Application Security Testing (SAST) has historically been governed by an unyielding trade-off: fast, deterministic static pattern matching produces unmanageable false-positive rates (frequently reaching 70% to over 90%), while deep formal methods (e.g., interprocedural path analysis and model checking) suffer from state-space explosions and steep computational overhead. Recent efforts to deploy Large Language Models (LLMs) as zero-shot code auditors attempt to bypass these limits, but introduce critical failure modes: high hallucination rates, non-deterministic outputs, and token costs that scale linearly with codebase size ($\mathcal{O}(N)$). Furthermore, existing analysis engines are architected almost exclusively for POSIX and web-application environments, leaving cyber-physical, bare-metal, and embedded protocol boundaries unmodeled.
 </p>
 <p>
-This whitepaper presents <strong>Semantrace</strong>, a cascaded neuro-symbolic security analysis architecture designed to resolve the <em>Precision–Recall–Cost Trilemma</em>. Semantrace establishes a gated pipeline that inverts traditional AI-for-code paradigms: rather than using probabilistic models to discover bugs, deterministic symbolic automata act as strict, cost-bounding gates ($\mathcal{O}(K)$ candidate witnesses), while a specialized neural reasoning engine acts as a bounded semantic oracle to prove or refute reachability and exploitability. Semantrace models cyber-physical inputs (CAN bus, BLE GATT, UART ISRs, OCPP) as first-class taint boundaries, constructs topology-aware call-graph slices to condition LLM reasoning, and mathematically computes CVSS 3.1 scores from discrete categorical vectors. Across benchmark evaluations on the official cURL security corpus (180 historical CVEs) and open-source embedded targets, Semantrace maintains high recall while eliminating LLM inference spend on over 75% of clean commits.
+This whitepaper presents <strong>SAIHNT</strong> (<strong>S</strong>tatic <strong>A</strong>nalysis <strong>I</strong>nto an Intelligent Vulnerability <strong>H</strong>u<strong>NT</strong>er), a cascaded neuro-symbolic security analysis architecture designed to resolve the <em>Precision–Recall–Cost Trilemma</em>. SAIHNT establishes a gated pipeline that inverts traditional AI-for-code paradigms: rather than using probabilistic models to discover bugs, deterministic symbolic automata act as strict, cost-bounding gates ($\mathcal{O}(K)$ candidate witnesses), while a specialized neural reasoning engine acts as a bounded semantic oracle to prove or refute reachability and exploitability. SAIHNT models cyber-physical inputs (CAN bus, BLE GATT, UART ISRs, OCPP) as first-class taint boundaries, constructs topology-aware call-graph slices to condition LLM reasoning, and mathematically computes CVSS 3.1 scores from discrete categorical vectors. Across benchmark evaluations on the official cURL security corpus (180 historical CVEs) and open-source embedded targets, SAIHNT maintains high recall while eliminating LLM inference spend on over 75% of clean commits.
 </p>
 </div>
 <hr />
@@ -1455,9 +1455,9 @@ This whitepaper presents <strong>Semantrace</strong>, a cascaded neuro-symbolic 
 <p>When firmware is audited with conventional web-oriented tooling, critical hardware-boundary vulnerabilities are either missed entirely or misclassified.</p>
 <hr />
 <h2 id="2-high-level-architectural-paradigm">2. High-Level Architectural Paradigm</h2>
-<p>Semantrace is founded on a core architectural principle: <strong>Symbolic models must govern search and cost; neural models must govern semantic verification.</strong></p>
+<p>SAIHNT is founded on a core architectural principle: <strong>Symbolic models must govern search and cost; neural models must govern semantic verification.</strong></p>
 <pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
-│                    The Cascaded Semantrace Pipeline                         │
+│                       The Cascaded SAIHNT Pipeline                          │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │  [Codebase / Commit Diff]                                                   │
@@ -1497,7 +1497,7 @@ This whitepaper presents <strong>Semantrace</strong>, a cascaded neuro-symbolic 
 │                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 </code></pre>
-<p>Rather than burdening an LLM with the unbounded task of ingesting an entire codebase to <em>find</em> vulnerabilities, Semantrace partitions the problem into a strictly ordered, multi-stage pipeline:</p>
+<p>Rather than burdening an LLM with the unbounded task of ingesting an entire codebase to <em>find</em> vulnerabilities, SAIHNT partitions the problem into a strictly ordered, multi-stage pipeline:</p>
 <h3>Stage 1: Deterministic Cost Gating ($\mathcal{O}(N)$)</h3>
 <p>A high-throughput signature engine screens incoming files using compiled, language-scoped syntactic patterns. If an incoming commit contains zero suspect constructs, the analysis terminates immediately. For typical production codebases where ~75% of commits do not introduce suspect constructs, <strong>total cloud inference cost is precisely $0.00</strong>.</p>
 <h3>Stage 2: Syntactic Boundary Slicing</h3>
@@ -1520,7 +1520,7 @@ This whitepaper presents <strong>Semantrace</strong>, a cascaded neuro-symbolic 
 </ol>
 <hr />
 <h2 id="3-cyber-physical-attack-surface-modeling">3. Cyber-Physical Attack Surface Modeling</h2>
-<p>Semantrace provides specialized modeling for embedded firmware, IoT, and industrial protocols. In this paradigm, taint sources are not limited to standard user input fields:</p>
+<p>SAIHNT provides specialized modeling for embedded firmware, IoT, and industrial protocols. In this paradigm, taint sources are not limited to standard user input fields:</p>
 <pre><code>[Hardware / Bus Source] ──► [Driver Ring Buffer / ISR] ──► [Parsing Logic] ──► [Control / Memory Sink]
   (e.g., CAN Frame,           (Unbounded copy,            (Missing length        (Actuator state change,
    BLE GATT Write)             race condition)             validation)            Buffer overflow)
@@ -1548,7 +1548,7 @@ This whitepaper presents <strong>Semantrace</strong>, a cascaded neuro-symbolic 
 </ul>
 <hr />
 <h2 id="4-closed-loop-rule-distillation">4. Closed-Loop Rule Distillation</h2>
-<p>A recurring limitation of static analysis is that rule sets require labor-intensive manual authoring. Semantrace addresses this via an automated <strong>Symbolic Distillation Loop</strong>:</p>
+<p>A recurring limitation of static analysis is that rule sets require labor-intensive manual authoring. SAIHNT addresses this via an automated <strong>Symbolic Distillation Loop</strong>:</p>
 <pre><code>[Candidate Code] ──► [Static Gate] ──► [Neural Verifier]
                             ▲                  │
                             │             (Discovers Novel
@@ -1565,7 +1565,7 @@ This whitepaper presents <strong>Semantrace</strong>, a cascaded neuro-symbolic 
 </ol>
 <hr />
 <h2 id="5-empirical-evaluation--benchmarks">5. Empirical Evaluation & Benchmarks</h2>
-<p>To evaluate vulnerability discovery accuracy, recall, and operational noise reduction, the Semantrace architecture was benchmarked across the public <strong>cURL Security Database</strong> (historical CVEs evaluated at vulnerable commit SHAs) and open-source cyber-physical reference targets.</p>
+<p>To evaluate vulnerability discovery accuracy, recall, and operational noise reduction, the SAIHNT architecture was benchmarked across the public <strong>cURL Security Database</strong> (historical CVEs evaluated at vulnerable commit SHAs) and open-source cyber-physical reference targets.</p>
 <h3>Real-World CVE Benchmark: The cURL Security Corpus (180 CVEs)</h3>
 <p>Evaluated against <strong>180 historical CVEs spanning 2000–2026</strong> from the official cURL security advisory database. Each target was audited strictly at the vulnerable commit SHA to assess whether the cascaded pipeline discovers the root vulnerability:</p>
 <table>
@@ -1573,7 +1573,7 @@ This whitepaper presents <strong>Semantrace</strong>, a cascaded neuro-symbolic 
 <tr>
 <th style="text-align:left">Vulnerability Category</th>
 <th style="text-align:center">Evaluated CVEs</th>
-<th style="text-align:center">Semantrace Detected</th>
+<th style="text-align:center">SAIHNT Detected</th>
 <th style="text-align:center">Recall Rate</th>
 <th style="text-align:left">Primary Verification Path</th>
 </tr>
@@ -1633,12 +1633,12 @@ This whitepaper presents <strong>Semantrace</strong>, a cascaded neuro-symbolic 
 <td style="text-align:center"><strong>180</strong></td>
 <td style="text-align:center"><strong>141</strong></td>
 <td style="text-align:center"><span class="table-badge table-badge-success">78.3%</span></td>
-<td style="text-align:left"><strong>Cascaded Neuro-Symbolic</strong></td>
+<td style="text-align:left"><strong>Cascaded Neuro-Symbolic (SAIHNT)</strong></td>
 </tr>
 </tbody>
 </table>
 <blockquote>
-<p><strong>Key Takeaway:</strong> Semantrace achieved <strong>100% recall on critical memory safety (CWE-122)</strong> and <strong>certificate validation (CWE-297)</strong> flaws in the cURL corpus, demonstrating that bounded semantic verification successfully confirms complex exploitability paths without the state explosion of formal model checkers.</p>
+<p><strong>Key Takeaway:</strong> SAIHNT achieved <strong>100% recall on critical memory safety (CWE-122)</strong> and <strong>certificate validation (CWE-297)</strong> flaws in the cURL corpus, demonstrating that bounded semantic verification successfully confirms complex exploitability paths without the state explosion of formal model checkers.</p>
 </blockquote>
 <h3>Cyber-Physical &amp; Embedded Protocol Evaluation</h3>
 <p>In evaluations across open-source embedded stacks (Linux SocketCAN drivers, RTOS serial ISRs, and open OCPP 1.6/2.0.1 implementations):</p>
@@ -1648,11 +1648,11 @@ This whitepaper presents <strong>Semantrace</strong>, a cascaded neuro-symbolic 
 <li><strong>Cleartext Transport:</strong> Caught insecure WebSocket transport (<code>ws://</code>) in charging point communications.</li>
 </ul>
 <h3>Continuous Integration Efficiency &amp; Noise Slicing</h3>
-<p>In continuous integration environments, Semantrace exhibits radical cost and signal-to-noise advantages over monolithic AI agents:</p>
+<p>In continuous integration environments, SAIHNT exhibits radical cost and signal-to-noise advantages over monolithic AI agents:</p>
 <ul>
 <li><strong>Clean Commit Bypassing:</strong> ~75% of commits trigger zero static witnesses, incurring precisely <strong>$0.00 cloud inference overhead</strong>.</li>
 <li><strong>Per-Vulnerability Audit Cost:</strong> Average verification cost is bounded to <strong>$0.02 – $0.05 per commit scan</strong>, compared to $0.70 – $2.00+ for unbounded agentic scans.</li>
-<li><strong>Noise Slicing:</strong> By requiring proof of reachability from untrusted sources to sensitive sinks, Semantrace cuts through the industry baseline of 70–91% false-positive static noise, presenting developers only with verified, exploitable witnesses.</li>
+<li><strong>Noise Slicing:</strong> By requiring proof of reachability from untrusted sources to sensitive sinks, SAIHNT cuts through the industry baseline of 70–91% false-positive static noise, presenting developers only with verified, exploitable witnesses.</li>
 </ul>
 <hr />
 <h2 id="6-security--operational-considerations">6. Security & Operational Considerations</h2>
@@ -1664,10 +1664,10 @@ This whitepaper presents <strong>Semantrace</strong>, a cascaded neuro-symbolic 
 </ol>
 <hr />
 <h2 id="7-conclusion">7. Conclusion</h2>
-<p>Semantrace demonstrates that the future of automated application security lies in a <strong>cascaded neuro-symbolic architecture</strong>: leveraging deterministic automata for computational speed, broad recall, and zero-cost guarantees on clean code, paired with bounded neural models for contextual reasoning and false-positive reduction.</p>
+<p>SAIHNT demonstrates that the future of automated application security lies in a <strong>cascaded neuro-symbolic architecture</strong>: leveraging deterministic automata for computational speed, broad recall, and zero-cost guarantees on clean code, paired with bounded neural models for contextual reasoning and false-positive reduction.</p>
 <hr />
 <h3 id="citation">Citation</h3>
-<p>If you reference Semantrace in your research or cite the Black Hat India presentation, please use the following BibTeX entry:</p>
+<p>If you reference SAIHNT in your research or cite the Black Hat India presentation, please use the following BibTeX entry:</p>
 <pre><code class="language-bibtex">@inproceedings{chattopadhyay2026killingnoise,
   title        = {Killing the 91% Noise: A Taint-Aware RAG Pipeline That Turns Static Analysis Into an Intelligent Vulnerability Hunter for Cloud and Embedded Systems},
   author       = {Shaunak Chattopadhyay},
@@ -1711,10 +1711,10 @@ This whitepaper presents <strong>Semantrace</strong>, a cascaded neuro-symbolic 
   <footer class="site-footer">
     <div class="footer-container">
       <div class="footer-brand">
-        <img src="assets/semantrace-icon.png" alt="Semantrace Icon" width="24" height="24" style="border-radius: 4px;" />
+        <img src="assets/semantrace-icon.png" alt="SAIHNT Icon" width="24" height="24" style="border-radius: 4px;" />
         <div class="footer-text">
           <strong>Shaunak Chattopadhyay</strong> • Technical White Paper<br>
-          Killing the 91% Noise: A Taint-Aware RAG Pipeline for Cloud &amp; Embedded Systems
+          SAIHNT: Static Analysis Into an Intelligent Vulnerability Hunter
         </div>
       </div>
       <ul class="footer-links">
@@ -1734,7 +1734,7 @@ This whitepaper presents <strong>Semantrace</strong>, a cascaded neuro-symbolic 
       const sunIcon = document.getElementById('sun-icon');
       const htmlEl = document.documentElement;
 
-      const savedTheme = localStorage.getItem('semantrace-theme') || 
+      const savedTheme = localStorage.getItem('saihnt-theme') || 
         (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
       
       setTheme(savedTheme);
@@ -1747,7 +1747,7 @@ This whitepaper presents <strong>Semantrace</strong>, a cascaded neuro-symbolic 
 
       function setTheme(theme) {
         htmlEl.setAttribute('data-theme', theme);
-        localStorage.setItem('semantrace-theme', theme);
+        localStorage.setItem('saihnt-theme', theme);
         if (theme === 'dark') {
           moonIcon.style.display = 'block';
           sunIcon.style.display = 'none';
@@ -1912,7 +1912,7 @@ This whitepaper presents <strong>Semantrace</strong>, a cascaded neuro-symbolic 
 
           let diagTitle = 'architecture-spec // neuro-symbolic';
           if (text.includes('High Recall')) diagTitle = 'program-analysis // trilemma';
-          else if (text.includes('Semantrace Pipeline')) diagTitle = 'cascaded-pipeline // flow-spec';
+          else if (text.includes('SAIHNT Pipeline')) diagTitle = 'cascaded-pipeline // flow-spec';
           else if (text.includes('Hardware / Bus')) diagTitle = 'cyber-physical // taint-surface';
           else if (text.includes('Symbolic Distillation')) diagTitle = 'closed-loop // rule-distillation';
 

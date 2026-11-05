@@ -1,5 +1,5 @@
-title: "Semantrace: Killing the 91% Noise | Black Hat India Briefing"
-description: "A Taint-Aware RAG Pipeline That Turns Static Analysis Into an Intelligent Vulnerability Hunter for Cloud and Embedded Systems"
+title: "SAIHNT: Killing the 91% Noise | Black Hat India Briefing"
+description: "Static Analysis Into an Intelligent Vulnerability Hunter (SAIHNT) - A Taint-Aware RAG Pipeline for Cloud and Embedded Systems"
 url: "https://semantrace.github.io"
 baseurl: ""
 
