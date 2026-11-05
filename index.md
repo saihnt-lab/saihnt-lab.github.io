@@ -23,7 +23,7 @@ A Taint-Aware RAG Pipeline That Turns Static Analysis Into an Intelligent Vulner
 </p>
 <div class="hero-byline">
 <strong>Shaunak Chattopadhyay</strong><br>
-<a href="https://semantrace.github.io">semantrace.github.io</a>
+<a href="https://saihnt-lab.github.io">saihnt-lab.github.io</a>
 </div>
 <div class="hero-actions">
 <a href="#abstract" class="btn-action btn-primary">
