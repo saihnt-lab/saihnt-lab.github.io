@@ -1,7 +1,7 @@
 ---
 layout: default
-title: "SAIHNT: Killing the 91% Noise | Black Hat India Briefing"
-description: "Static Analysis Into an Intelligent Vulnerability Hunter (SAIHNT) - A Taint-Aware RAG Pipeline for Cloud and Embedded Systems"
+title: "Logos: Killing the 91% Noise | Black Hat India Briefing"
+description: "Logos - A Taint-Aware RAG Pipeline for Cloud and Embedded Systems"
 ---
 
 <div class="hero-wrapper">
@@ -13,14 +13,14 @@ description: "Static Analysis Into an Intelligent Vulnerability Hunter (SAIHNT) 
 <span class="meta-badge">Cloud &amp; Embedded Systems</span>
 </div>
 <h1 class="hero-title">
-<span class="gradient-text">SAIHNT</span>: Killing the 91% Noise
+<span class="gradient-text">Logos</span>: Killing the 91% Noise
 </h1>
 <p class="hero-subtitle">
 A Taint-Aware RAG Pipeline That Turns Static Analysis Into an Intelligent Vulnerability Hunter for Cloud and Embedded Systems
 </p>
 <div class="hero-byline">
 <strong>Shaunak Chattopadhyay</strong><br>
-<a href="https://logos.github.io">logos.github.io</a>
+<a href="https://saihnt-lab.github.io">saihnt-lab.github.io</a>
 </div>
 <div class="hero-actions">
 <a href="#abstract" class="btn-action btn-primary">
@@ -94,7 +94,7 @@ View on Official Black Hat India Schedule ↗
 Static Application Security Testing (SAST) has historically been governed by an unyielding trade-off: fast, deterministic static pattern matching produces unmanageable false-positive rates (frequently reaching 70% to over 90%), while deep formal methods (e.g., interprocedural path analysis and model checking) suffer from state-space explosions and steep computational overhead. Recent efforts to deploy Large Language Models (LLMs) as zero-shot code auditors attempt to bypass these limits, but introduce critical failure modes: high hallucination rates, non-deterministic outputs, and token costs that scale linearly with codebase size ($\mathcal{O}(N)$). Furthermore, existing analysis engines are architected almost exclusively for POSIX and web-application environments, leaving cyber-physical, bare-metal, and embedded protocol boundaries unmodeled.
 </p>
 <p>
-This whitepaper presents <strong>SAIHNT</strong> (<strong>S</strong>tatic <strong>A</strong>nalysis <strong>I</strong>nto an Intelligent Vulnerability <strong>H</strong>u<strong>NT</strong>er), a cascaded neuro-symbolic security analysis architecture designed to resolve the <em>Precision–Recall–Cost Trilemma</em>. SAIHNT establishes a gated pipeline that inverts traditional AI-for-code paradigms: rather than using probabilistic models to discover bugs, deterministic symbolic automata act as strict, cost-bounding gates ($\mathcal{O}(K)$ candidate witnesses), while a specialized neural reasoning engine acts as a bounded semantic oracle to prove or refute reachability and exploitability. SAIHNT models cyber-physical inputs (CAN bus, BLE GATT, UART ISRs, OCPP) as first-class taint boundaries, constructs topology-aware call-graph slices to condition LLM reasoning, and mathematically computes CVSS 3.1 scores from discrete categorical vectors. Across benchmark evaluations on the official cURL security corpus (180 historical CVEs) and open-source embedded targets, SAIHNT maintains high recall while eliminating LLM inference spend on over 75% of clean commits.
+This whitepaper presents **Logos**, a cascaded neuro-symbolic security analysis architecture designed to resolve the <em>Precision–Recall–Cost Trilemma</em>. Logos establishes a gated pipeline that inverts traditional AI-for-code paradigms: rather than using probabilistic models to discover bugs, deterministic symbolic automata act as strict, cost-bounding gates ($\mathcal{O}(K)$ candidate witnesses), while a specialized neural reasoning engine acts as a bounded semantic oracle to prove or refute reachability and exploitability. Logos models cyber-physical inputs (CAN bus, BLE GATT, UART ISRs, OCPP) as first-class taint boundaries, constructs topology-aware call-graph slices to condition LLM reasoning, and mathematically computes CVSS 3.1 scores from discrete categorical vectors. Across benchmark evaluations on the official cURL security corpus (180 historical CVEs) and open-source embedded targets, Logos maintains high recall while eliminating LLM inference spend on over 75% of clean commits.
 </p>
 </div>
 
@@ -133,11 +133,11 @@ When firmware is audited with conventional web-oriented tooling, critical hardwa
 
 <h2 id="2-high-level-architectural-paradigm">2. High-Level Architectural Paradigm</h2>
 
-SAIHNT is founded on a core architectural principle: **Symbolic models must govern search and cost; neural models must govern semantic verification.**
+Logos is founded on a core architectural principle: **Symbolic models must govern search and cost; neural models must govern semantic verification.**
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                       The Cascaded SAIHNT Pipeline                          │
+│                        The Cascaded Logos Pipeline                          │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
 │  [Codebase / Commit Diff]                                                   │
@@ -178,7 +178,7 @@ SAIHNT is founded on a core architectural principle: **Symbolic models must gove
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-Rather than burdening an LLM with the unbounded task of ingesting an entire codebase to *find* vulnerabilities, SAIHNT partitions the problem into a strictly ordered, multi-stage pipeline:
+Rather than burdening an LLM with the unbounded task of ingesting an entire codebase to *find* vulnerabilities, Logos partitions the problem into a strictly ordered, multi-stage pipeline:
 
 ### Stage 1: Deterministic Cost Gating ($\mathcal{O}(N)$)
 A high-throughput signature engine screens incoming files using compiled, language-scoped syntactic patterns. If an incoming commit contains zero suspect constructs, the analysis terminates immediately. For typical production codebases where ~75% of commits do not introduce suspect constructs, **total cloud inference cost is precisely \$0.00**.
@@ -206,7 +206,7 @@ To avoid non-deterministic and hallucinated severity metrics, scoring is decoupl
 
 <h2 id="3-cyber-physical-attack-surface-modeling">3. Cyber-Physical Attack Surface Modeling</h2>
 
-SAIHNT provides specialized modeling for embedded firmware, IoT, and industrial protocols. In this paradigm, taint sources are not limited to standard user input fields:
+Logos provides specialized modeling for embedded firmware, IoT, and industrial protocols. In this paradigm, taint sources are not limited to standard user input fields:
 
 ```
 [Hardware / Bus Source] ──► [Driver Ring Buffer / ISR] ──► [Parsing Logic] ──► [Control / Memory Sink]
@@ -235,7 +235,7 @@ SAIHNT provides specialized modeling for embedded firmware, IoT, and industrial 
 
 <h2 id="4-closed-loop-rule-distillation">4. Closed-Loop Rule Distillation</h2>
 
-A recurring limitation of static analysis is that rule sets require labor-intensive manual authoring. SAIHNT addresses this via an automated **Symbolic Distillation Loop**:
+A recurring limitation of static analysis is that rule sets require labor-intensive manual authoring. Logos addresses this via an automated **Symbolic Distillation Loop**:
 
 ```
 [Candidate Code] ──► [Static Gate] ──► [Neural Verifier]
@@ -256,12 +256,12 @@ A recurring limitation of static analysis is that rule sets require labor-intens
 
 <h2 id="5-empirical-evaluation--benchmarks">5. Empirical Evaluation & Benchmarks</h2>
 
-To evaluate vulnerability discovery accuracy, recall, and operational noise reduction, the SAIHNT architecture was benchmarked across the public **cURL Security Database** (historical CVEs evaluated at vulnerable commit SHAs) and open-source cyber-physical reference targets.
+To evaluate vulnerability discovery accuracy, recall, and operational noise reduction, the Logos architecture was benchmarked across the public **cURL Security Database** (historical CVEs evaluated at vulnerable commit SHAs) and open-source cyber-physical reference targets.
 
 ### Real-World CVE Benchmark: The cURL Security Corpus (180 CVEs)
 Evaluated against **180 historical CVEs spanning 2000–2026** from the official cURL security advisory database. Each target was audited strictly at the vulnerable commit SHA to assess whether the cascaded pipeline discovers the root vulnerability:
 
-| Vulnerability Category | Evaluated CVEs | SAIHNT Detected | Recall Rate | Primary Verification Path |
+| Vulnerability Category | Evaluated CVEs | Logos Detected | Recall Rate | Primary Verification Path |
 | :--- | :---: | :---: | :---: | :--- |
 | **Heap Buffer Overflow (CWE-122)** | 8 | 8 | <span class="table-badge table-badge-success">100%</span> | AST Boundary + Neural Prove |
 | **Certificate Validation Bypass (CWE-297)** | 7 | 7 | <span class="table-badge table-badge-success">100%</span> | Taint Reachability to TLS Sink |
@@ -270,9 +270,9 @@ Evaluated against **180 historical CVEs spanning 2000–2026** from the official
 | **Integer Overflow / Wrap (CWE-190)** | 11 | 9 | <span class="table-badge table-badge-highlight">81.8%</span> | Arithmetic Path Reachability |
 | **Null Pointer Dereference (CWE-476)** | 14 | 12 | <span class="table-badge table-badge-highlight">85.7%</span> | Scope Boundary Extraction |
 | **Protocol Parsing & State Flaws (Misc)** | 119 | 86 | <span class="table-badge table-badge-highlight">72.3%</span> | Multi-Stage Verification Pipeline |
-| **Overall Benchmark Suite** | **180** | **141** | <span class="table-badge table-badge-success">78.3%</span> | **Cascaded Neuro-Symbolic (SAIHNT)** |
+| **Overall Benchmark Suite** | **180** | **141** | <span class="table-badge table-badge-success">78.3%</span> | **Cascaded Neuro-Symbolic (Logos)** |
 
-> **Key Takeaway:** SAIHNT achieved **100% recall on critical memory safety (CWE-122)** and **certificate validation (CWE-297)** flaws in the cURL corpus, demonstrating that bounded semantic verification successfully confirms complex exploitability paths without the state explosion of formal model checkers.
+> **Key Takeaway:** Logos achieved **100% recall on critical memory safety (CWE-122)** and **certificate validation (CWE-297)** flaws in the cURL corpus, demonstrating that bounded semantic verification successfully confirms complex exploitability paths without the state explosion of formal model checkers.
 
 ### Cyber-Physical & Embedded Protocol Evaluation
 In evaluations across open-source embedded stacks (Linux SocketCAN drivers, RTOS serial ISRs, and open OCPP 1.6/2.0.1 implementations):
@@ -281,10 +281,10 @@ In evaluations across open-source embedded stacks (Linux SocketCAN drivers, RTOS
 * **Cleartext Transport:** Caught insecure WebSocket transport (`ws://`) in charging point communications.
 
 ### Continuous Integration Efficiency & Noise Slicing
-In continuous integration environments, SAIHNT exhibits radical cost and signal-to-noise advantages over monolithic AI agents:
+In continuous integration environments, Logos exhibits radical cost and signal-to-noise advantages over monolithic AI agents:
 * **Clean Commit Bypassing:** ~75% of commits trigger zero static witnesses, incurring precisely **$0.00 cloud inference overhead**.
 * **Per-Vulnerability Audit Cost:** Average verification cost is bounded to **$0.02 – $0.05 per commit scan**, compared to \$0.70 – \$2.00+ for unbounded agentic scans.
-* **Noise Slicing:** By requiring proof of reachability from untrusted sources to sensitive sinks, SAIHNT cuts through the industry baseline of 70–91% false-positive static noise, presenting developers only with verified, exploitable witnesses.
+* **Noise Slicing:** By requiring proof of reachability from untrusted sources to sensitive sinks, Logos cuts through the industry baseline of 70–91% false-positive static noise, presenting developers only with verified, exploitable witnesses.
 
 ---
 
@@ -299,13 +299,13 @@ A security tool must itself adhere to rigorous defense-in-depth principles:
 
 <h2 id="7-conclusion">7. Conclusion</h2>
 
-SAIHNT demonstrates that the future of automated application security lies in a **cascaded neuro-symbolic architecture**: leveraging deterministic automata for computational speed, broad recall, and zero-cost guarantees on clean code, paired with bounded neural models for contextual reasoning and false-positive reduction.
+Logos demonstrates that the future of automated application security lies in a **cascaded neuro-symbolic architecture**: leveraging deterministic automata for computational speed, broad recall, and zero-cost guarantees on clean code, paired with bounded neural models for contextual reasoning and false-positive reduction.
 
 ---
 
 <h3 id="citation">Citation</h3>
 
-If you reference SAIHNT in your research or cite the Black Hat India presentation, please use the following BibTeX entry:
+If you reference Logos in your research or cite the Black Hat India presentation, please use the following BibTeX entry:
 
 ```bibtex
 @inproceedings{chattopadhyay2026killingnoise,

@@ -1,6 +1,6 @@
-title: "SAIHNT: Killing the 91% Noise | Black Hat India Briefing"
-description: "Static Analysis Into an Intelligent Vulnerability Hunter (SAIHNT) - A Taint-Aware RAG Pipeline for Cloud and Embedded Systems"
-url: "https://logos.github.io"
+title: "Logos: Killing the 91% Noise | Black Hat India Briefing"
+description: "Logos - A Taint-Aware RAG Pipeline for Cloud and Embedded Systems"
+url: "https://saihnt-lab.github.io"
 baseurl: ""
 
 # Markdown & Math Processing
